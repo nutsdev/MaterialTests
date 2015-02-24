@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.nutsdev.activities.MainActivity">
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/navigate"
+        android:title="@string/next"
+        android:orderInCategory="200"
+        android:icon="@android:drawable/ic_media_ff"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/action_activity_library"
+        android:title="Start Library Activity"
+        android:orderInCategory="300"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/action_activity_vector"
+        android:title="Start Vector Activity"
+        android:orderInCategory="400"
+        app:showAsAction="never" />
+
+</menu>
