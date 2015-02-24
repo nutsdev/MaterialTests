@@ -37,7 +37,7 @@ public class FragmentBoxOffice extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
+    // volley singleton
     private VolleySingleton volleySingleton;
     private ImageLoader imageLoader;
     private RequestQueue requestQueue;
