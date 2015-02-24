@@ -17,8 +17,33 @@ import com.nutsdev.logging.L;
 import com.nutsdev.materialtest.MyApplication;
 import com.nutsdev.materialtest.R;
 import com.nutsdev.network.VolleySingleton;
+import com.nutsdev.pojo.Movie;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
+import static com.nutsdev.extras.Keys.EndpointBoxOffice.KEY_AUDIENCE_SCORE;
+import static com.nutsdev.extras.Keys.EndpointBoxOffice.KEY_ID;
+import static com.nutsdev.extras.Keys.EndpointBoxOffice.KEY_MOVIES;
+import static com.nutsdev.extras.Keys.EndpointBoxOffice.KEY_POSTERS;
+import static com.nutsdev.extras.Keys.EndpointBoxOffice.KEY_RATINGS;
+import static com.nutsdev.extras.Keys.EndpointBoxOffice.KEY_RELEASE_DATES;
+import static com.nutsdev.extras.Keys.EndpointBoxOffice.KEY_SYNOPSIS;
+import static com.nutsdev.extras.Keys.EndpointBoxOffice.KEY_THEATER;
+import static com.nutsdev.extras.Keys.EndpointBoxOffice.KEY_THUMBNAIL;
+import static com.nutsdev.extras.Keys.EndpointBoxOffice.KEY_TITLE;
+import static com.nutsdev.extras.UrlEndpoints.URL_BOX_OFFICE;
+import static com.nutsdev.extras.UrlEndpoints.URL_CHAR_AMPERSAND;
+import static com.nutsdev.extras.UrlEndpoints.URL_CHAR_QUESTION;
+import static com.nutsdev.extras.UrlEndpoints.URL_PARAM_API_KEY;
+import static com.nutsdev.extras.UrlEndpoints.URL_PARAM_LIMIT;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,6 +67,9 @@ public class FragmentBoxOffice extends Fragment {
     private ImageLoader imageLoader;
     private RequestQueue requestQueue;
 
+    private ArrayList<Movie> listMovies = new ArrayList<>();
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
 
     /**
      * Use this factory method to create a new instance of
@@ -62,7 +90,11 @@ public class FragmentBoxOffice extends Fragment {
     }
 
     public static String getRequestUrl(int limit) {
-        return URL_ROTTEN_TOMATOES_BOX_OFFICE + "?apikey=" + MyApplication.API_KEY_ROTTEN_TOMATOES + "&limit=" + limit;
+        return URL_BOX_OFFICE
+                + URL_CHAR_QUESTION
+                + URL_PARAM_API_KEY + MyApplication.API_KEY_ROTTEN_TOMATOES
+                + URL_CHAR_AMPERSAND
+                + URL_PARAM_LIMIT + limit;
     }
 
     public FragmentBoxOffice() {
@@ -80,13 +112,18 @@ public class FragmentBoxOffice extends Fragment {
         volleySingleton = VolleySingleton.getInstance();
         requestQueue = volleySingleton.getRequestQueue();
 
+        sendJsonRequest();
+    }
+
+    private void sendJsonRequest() {
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, getRequestUrl(10), null,
                 new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                L.t(getActivity(), response.toString());
-            }
-        }, new Response.ErrorListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        parseJsonResponse(response);
+                    //    L.t(getActivity(), response.toString());
+                    }
+                }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
@@ -94,6 +131,66 @@ public class FragmentBoxOffice extends Fragment {
         });
 
         requestQueue.add(request);
+    }
+
+    private void parseJsonResponse(JSONObject response) {
+        if (response == null || response.length() == 0) {
+            return;
+        }
+
+        try {
+            StringBuilder data = new StringBuilder();
+            if (response.has(KEY_MOVIES)) {
+                JSONArray arrayMovies = response.getJSONArray(KEY_MOVIES);
+                for (int i = 0; i < arrayMovies.length(); i++) {
+                    JSONObject currentMovie = arrayMovies.getJSONObject(i);
+                    // get the id of the current movie
+                    long id = currentMovie.getLong(KEY_ID);
+                    // get the title of the current movie
+                    String title = currentMovie.getString(KEY_TITLE);
+                    // get date in theatre
+                    JSONObject objectReleaseDates = currentMovie.getJSONObject(KEY_RELEASE_DATES);
+                    String releaseDate = null;
+                    if (objectReleaseDates.has(KEY_THEATER)) {
+                        releaseDate = objectReleaseDates.getString(KEY_THEATER);
+                    } else {
+                        releaseDate = "NA";
+                    }
+
+                    //get the audience score for the current movie
+                    JSONObject objectRatings = currentMovie.getJSONObject(KEY_RATINGS);
+                    int audienceScore = -1;
+                    if (objectRatings.has(KEY_AUDIENCE_SCORE)) {
+                        audienceScore = objectRatings.getInt(KEY_AUDIENCE_SCORE);
+                    }
+                    //get the synopsis
+                    String synopsis = currentMovie.getString(KEY_SYNOPSIS);
+
+                    JSONObject objectPosters = currentMovie.getJSONObject(KEY_POSTERS);
+                    String urlThumbnail = null;
+                    if (objectPosters.has(KEY_THUMBNAIL)) {
+                        urlThumbnail = objectPosters.getString(KEY_THUMBNAIL);
+                    }
+
+                    Movie movie = new Movie();
+                    movie.setId(id);
+                    movie.setTitle(title);
+                    Date date = dateFormat.parse(releaseDate);
+                    movie.setReleaseDateTheater(date);
+                    movie.setAudienceScore(audienceScore);
+                    movie.setSynopsis(synopsis);
+                    movie.setUrlThumbnail(urlThumbnail);
+
+                    listMovies.add(movie);
+                //    data.append(id + " " + title + " " + releaseDate + " " + audienceScore + "\n");
+                }
+                L.t(getActivity(), listMovies.toString());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

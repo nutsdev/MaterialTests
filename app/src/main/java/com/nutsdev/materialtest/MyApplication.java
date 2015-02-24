@@ -8,7 +8,8 @@ import android.content.Context;
  */
 public class MyApplication extends Application {
 
-    public static final String API_KEY_ROTTEN_TOMATOES = "7br8hd52ba57zheu4r4vw9rv";
+    // my inactive key 7br8hd52ba57zheu4r4vw9rv
+    public static final String API_KEY_ROTTEN_TOMATOES = "54wzfswsa4qmjg8hjwa64d4c";
     private static MyApplication sInstance;
 
     @Override
