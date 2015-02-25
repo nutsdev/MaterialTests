@@ -3,6 +3,8 @@ package com.nutsdev.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.nutsdev.adapters.AdapterBoxOffice;
 import com.nutsdev.logging.L;
 import com.nutsdev.materialtest.MyApplication;
 import com.nutsdev.materialtest.R;
@@ -69,6 +72,8 @@ public class FragmentBoxOffice extends Fragment {
 
     private ArrayList<Movie> listMovies = new ArrayList<>();
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private AdapterBoxOffice adapterBoxOffice;
+    private RecyclerView listMovieHits;
 
 
     /**
@@ -120,8 +125,8 @@ public class FragmentBoxOffice extends Fragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        parseJsonResponse(response);
-                    //    L.t(getActivity(), response.toString());
+                        listMovies = parseJsonResponse(response);
+                        adapterBoxOffice.setMovieList(listMovies);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -133,15 +138,13 @@ public class FragmentBoxOffice extends Fragment {
         requestQueue.add(request);
     }
 
-    private void parseJsonResponse(JSONObject response) {
-        if (response == null || response.length() == 0) {
-            return;
-        }
+    private ArrayList<Movie> parseJsonResponse(JSONObject response) {
+        ArrayList<Movie> listMovies = new ArrayList<>();
 
-        try {
-            StringBuilder data = new StringBuilder();
-            if (response.has(KEY_MOVIES)) {
+        if (response != null || response.length() > 0) {
+            try {
                 JSONArray arrayMovies = response.getJSONArray(KEY_MOVIES);
+
                 for (int i = 0; i < arrayMovies.length(); i++) {
                     JSONObject currentMovie = arrayMovies.getJSONObject(i);
                     // get the id of the current movie
@@ -182,22 +185,32 @@ public class FragmentBoxOffice extends Fragment {
                     movie.setUrlThumbnail(urlThumbnail);
 
                     listMovies.add(movie);
-                //    data.append(id + " " + title + " " + releaseDate + " " + audienceScore + "\n");
                 }
                 L.t(getActivity(), listMovies.toString());
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
+
+        return listMovies;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_box_office, container, false);
+        View view = inflater.inflate(R.layout.fragment_box_office, container, false);
+
+        listMovieHits = (RecyclerView) view.findViewById(R.id.listMovieHits);
+        listMovieHits.setLayoutManager(new LinearLayoutManager(getActivity()));
+        adapterBoxOffice = new AdapterBoxOffice(getActivity());
+        listMovieHits.setAdapter(adapterBoxOffice);
+        sendJsonRequest();
+
+        return view;
     }
 
 
