@@ -205,7 +205,7 @@ public class FragmentBoxOffice extends Fragment {
                     movie.setId(id);
                     movie.setTitle(title);
                     Date date = null;
-                    try {
+                    try { // todo resolve Exception!
                         date = dateFormat.parse(releaseDate);
                     } catch (ParseException e) {
                         L.t(getActivity(), "PARSE EXCEPTION CATCHED!");
@@ -219,7 +219,7 @@ public class FragmentBoxOffice extends Fragment {
                         listMovies.add(movie);
                     }
                 }
-                L.t(getActivity(), listMovies.toString());
+            //    L.t(getActivity(), listMovies.toString());
 
             } catch (JSONException e) {
                 e.printStackTrace();
