@@ -1,5 +1,6 @@
 package com.nutsdev.activities;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -24,10 +25,14 @@ import com.nutsdev.fragments.FragmentSearch;
 import com.nutsdev.fragments.FragmentUpcoming;
 import com.nutsdev.fragments.NavigationDrawerFragment;
 import com.nutsdev.materialtest.R;
+import com.nutsdev.services.MyService;
 import com.nutsdev.views.SlidingTabLayout;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton;
 import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
 import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
+
+import me.tatarka.support.job.JobInfo;
+import me.tatarka.support.job.JobScheduler;
 
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
@@ -39,6 +44,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private static final String TAG_SORT_NAME = "sortName";
     private static final String TAG_SORT_DATE = "sortDate";
     private static final String TAG_SORT_RATINGS = "sortRatings";
+    private static final int JOB_ID = 100;
+
+    private JobScheduler jobScheduler;
 
     private Toolbar toolbar;
     private NavigationDrawerFragment drawerFragment;
@@ -51,6 +59,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        jobScheduler = JobScheduler.getInstance(this);
+        constructJob();
 
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
@@ -74,6 +85,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         mTabs.setViewPager(mPager);
 
         buildFloatingActionButton();
+    }
+
+    private void constructJob() {
+        JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, new ComponentName(this, MyService.class));
+        builder.setPeriodic(2000)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                .setPersisted(true);
+
+        jobScheduler.schedule(builder.build());
     }
 
     private void buildFloatingActionButton() {
