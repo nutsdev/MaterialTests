@@ -15,8 +15,10 @@ import android.text.Spanned;
 import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 
+import com.nutsdev.extras.SortListener;
 import com.nutsdev.fragments.FragmentBoxOffice;
 import com.nutsdev.fragments.FragmentSearch;
 import com.nutsdev.fragments.FragmentUpcoming;
@@ -28,15 +30,20 @@ import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
 import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
     public static final int MOVIES_SEARCH_RESULTS = 0;
     public static final int MOVIES_HITS = 1;
     public static final int MOVIES_UPCOMING = 2;
 
+    private static final String TAG_SORT_NAME = "sortName";
+    private static final String TAG_SORT_DATE = "sortDate";
+    private static final String TAG_SORT_RATINGS = "sortRatings";
+
     private Toolbar toolbar;
     private NavigationDrawerFragment drawerFragment;
 
+    private ViewPagerAdapter adapter;
     private ViewPager mPager;
     private SlidingTabLayout mTabs;
 
@@ -54,7 +61,7 @@ public class MainActivity extends ActionBarActivity {
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
 
         mPager = (ViewPager) findViewById(R.id.pager);
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(adapter);
 
         mTabs = (SlidingTabLayout) findViewById(R.id.tabs);
@@ -66,24 +73,39 @@ public class MainActivity extends ActionBarActivity {
         mTabs.setSelectedIndicatorColors(getResources().getColor(R.color.colorAccent));
         mTabs.setViewPager(mPager);
 
-        ImageView imageView = new ImageView(this);
-        imageView.setImageResource(R.drawable.ic_launcher);
+        buildFloatingActionButton();
+    }
+
+    private void buildFloatingActionButton() {
+        ImageView imageActionButton = new ImageView(this);
+        imageActionButton.setImageResource(R.drawable.ic_action_new);
 
         FloatingActionButton actionButton = new FloatingActionButton.Builder(this)
-                .setContentView(imageView)
+                .setContentView(imageActionButton)
+                .setBackgroundDrawable(R.drawable.selector_button_red)
                 .build();
 
         ImageView iconSortName = new ImageView(this);
-        iconSortName.setImageResource(R.drawable.ic_abstract);
+        iconSortName.setImageResource(R.drawable.ic_action_alphabets);
         ImageView iconSortDate = new ImageView(this);
-        iconSortDate.setImageResource(R.drawable.ic_abstract);
+        iconSortDate.setImageResource(R.drawable.ic_action_calendar);
         ImageView iconSortRatings = new ImageView(this);
-        iconSortRatings.setImageResource(R.drawable.ic_abstract);
+        iconSortRatings.setImageResource(R.drawable.ic_action_important);
 
         SubActionButton.Builder itemBuilder = new SubActionButton.Builder(this);
+        itemBuilder.setBackgroundDrawable(getResources().getDrawable(R.drawable.selector_sub_button_gray));
+
         SubActionButton buttonSortName = itemBuilder.setContentView(iconSortName).build();
         SubActionButton buttonSortDate = itemBuilder.setContentView(iconSortDate).build();
         SubActionButton buttonSortRatings = itemBuilder.setContentView(iconSortRatings).build();
+
+        buttonSortName.setOnClickListener(this);
+        buttonSortDate.setOnClickListener(this);
+        buttonSortRatings.setOnClickListener(this);
+
+        buttonSortName.setTag(TAG_SORT_NAME);
+        buttonSortDate.setTag(TAG_SORT_DATE);
+        buttonSortRatings.setTag(TAG_SORT_RATINGS);
 
         FloatingActionMenu actionMenu = new FloatingActionMenu.Builder(this)
                 .addSubActionView(buttonSortName)
@@ -92,7 +114,6 @@ public class MainActivity extends ActionBarActivity {
                 .attachTo(actionButton)
                 .build();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -123,6 +144,23 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        Fragment fragment = (Fragment) adapter.instantiateItem(mPager, mPager.getCurrentItem());
+        if (fragment instanceof SortListener) {
+            if (v.getTag().equals(TAG_SORT_NAME)) {
+                ((SortListener) fragment).onSortByName();
+            }
+            else if (v.getTag().equals(TAG_SORT_DATE)) {
+                ((SortListener) fragment).onSortByDate();
+            }
+            else if (v.getTag().equals(TAG_SORT_RATINGS)) {
+                ((SortListener) fragment).onSortByRatings();
+            }
+        }
+
     }
 
     private class ViewPagerAdapter extends FragmentStatePagerAdapter {

@@ -24,6 +24,8 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.nutsdev.adapters.AdapterBoxOffice;
 import com.nutsdev.extras.Constants;
+import com.nutsdev.extras.MovieSorter;
+import com.nutsdev.extras.SortListener;
 import com.nutsdev.logging.L;
 import com.nutsdev.materialtest.MyApplication;
 import com.nutsdev.materialtest.R;
@@ -61,7 +63,7 @@ import static com.nutsdev.extras.UrlEndpoints.URL_PARAM_LIMIT;
  * Use the {@link FragmentBoxOffice#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FragmentBoxOffice extends Fragment {
+public class FragmentBoxOffice extends Fragment implements SortListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -83,6 +85,7 @@ public class FragmentBoxOffice extends Fragment {
     private AdapterBoxOffice adapterBoxOffice;
     private RecyclerView listMovieHits;
     private TextView textVolleyError;
+    private MovieSorter movieSorter = new MovieSorter();
 
 
     /**
@@ -261,4 +264,21 @@ public class FragmentBoxOffice extends Fragment {
     }
 
 
+    @Override
+    public void onSortByName() {
+        movieSorter.sortMoviesByName(listMovies);
+        adapterBoxOffice.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onSortByDate() {
+        movieSorter.sortMoviesByDate(listMovies);
+        adapterBoxOffice.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onSortByRatings() {
+        movieSorter.sortMoviesByRatings(listMovies);
+        adapterBoxOffice.notifyDataSetChanged();
+    }
 }
