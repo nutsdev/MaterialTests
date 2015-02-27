@@ -24,7 +24,10 @@ public class MovieSorter {
         Collections.sort(movies, new Comparator<Movie>() {
             @Override
             public int compare(Movie lhs, Movie rhs) {
-                return lhs.getReleaseDateTheater().compareTo(rhs.getReleaseDateTheater());
+                if (lhs.getReleaseDateTheater() != null && rhs.getReleaseDateTheater() != null)
+                    return lhs.getReleaseDateTheater().compareTo(rhs.getReleaseDateTheater());
+                else
+                    return 0;
             }
         });
     }
