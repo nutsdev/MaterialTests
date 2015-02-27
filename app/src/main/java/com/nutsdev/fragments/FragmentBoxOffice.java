@@ -71,6 +71,7 @@ public class FragmentBoxOffice extends Fragment implements SortListener {
 
     public static final String URL_ROTTEN_TOMATOES_BOX_OFFICE =
             "http://api.rottentomatoes.com/api/public/v1.0/lists/movies/box_office.json";
+    private static final String STATE_MOVIES = "StateMovies";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -85,7 +86,7 @@ public class FragmentBoxOffice extends Fragment implements SortListener {
     private AdapterBoxOffice adapterBoxOffice;
     private RecyclerView listMovieHits;
     private TextView textVolleyError;
-    private MovieSorter movieSorter = new MovieSorter();
+    private MovieSorter movieSorter;
 
 
     /**
@@ -116,6 +117,8 @@ public class FragmentBoxOffice extends Fragment implements SortListener {
 
     public FragmentBoxOffice() {
         // Required empty public constructor
+
+        movieSorter = new MovieSorter();
     }
 
     @Override
@@ -128,8 +131,13 @@ public class FragmentBoxOffice extends Fragment implements SortListener {
 
         volleySingleton = VolleySingleton.getInstance();
         requestQueue = volleySingleton.getRequestQueue();
+    }
 
-        sendJsonRequest();
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelableArrayList(STATE_MOVIES, listMovies);
     }
 
     private void sendJsonRequest() {
@@ -222,7 +230,7 @@ public class FragmentBoxOffice extends Fragment implements SortListener {
                         listMovies.add(movie);
                     }
                 }
-            //    L.t(getActivity(), listMovies.toString());
+                L.t(getActivity(), listMovies.size() + "");
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -258,7 +266,13 @@ public class FragmentBoxOffice extends Fragment implements SortListener {
         listMovieHits.setLayoutManager(new LinearLayoutManager(getActivity()));
         adapterBoxOffice = new AdapterBoxOffice(getActivity());
         listMovieHits.setAdapter(adapterBoxOffice);
-        sendJsonRequest();
+
+        if (savedInstanceState != null) {
+            listMovies = savedInstanceState.getParcelableArrayList(STATE_MOVIES);
+            adapterBoxOffice.setMovieList(listMovies);
+        } else {
+            sendJsonRequest();
+        }
 
         return view;
     }

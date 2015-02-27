@@ -1,11 +1,14 @@
 package com.nutsdev.pojo;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.Date;
 
 /**
  * Created by n1ck on 23.02.2015.
  */
-public class Movie {
+public class Movie implements Parcelable {
 
     private long id;
     private String title;
@@ -20,6 +23,19 @@ public class Movie {
 
     public Movie() {
 
+    }
+
+    public Movie(Parcel input) {
+        id = input.readLong();
+        title = input.readString();
+        releaseDateTheater = input.readLong() == -1 ? null : new Date(input.readLong());
+        audienceScore = input.readInt();
+        synopsis = input.readString();
+        urlThumbnail = input.readString();
+        urlSelf = input.readString();
+        urlCast = input.readString();
+        urlReviews = input.readString();
+        urlSimilar = input.readString();
     }
 
     public Movie(long id, String title, Date releaseDateTheater, int audienceScore, String synopsis, String urlThumbnail,
@@ -107,5 +123,38 @@ public class Movie {
                 "urlThumbnail "+urlThumbnail+
                 "\n";
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(title);
+        dest.writeLong(releaseDateTheater == null ? -1 : releaseDateTheater.getTime());
+        dest.writeInt(audienceScore);
+        dest.writeString(synopsis);
+        dest.writeString(urlThumbnail);
+        dest.writeString(urlSelf);
+        dest.writeString(urlCast);
+        dest.writeString(urlReviews);
+        dest.writeString(urlSimilar);
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+
+        @Override
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+
+    };
 
 }
