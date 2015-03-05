@@ -89,7 +89,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private void constructJob() {
         JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, new ComponentName(this, MyService.class));
-        builder.setPeriodic(2000)
+        builder.setPeriodic(4000)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
                 .setPersisted(true);
 
