@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -45,6 +46,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private static final String TAG_SORT_DATE = "sortDate";
     private static final String TAG_SORT_RATINGS = "sortRatings";
     private static final int JOB_ID = 100;
+    private static final long POLL_FREQUENCY = 12000000;
 
     private JobScheduler jobScheduler;
 
@@ -61,7 +63,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         jobScheduler = JobScheduler.getInstance(this);
-        constructJob();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                constructJob();
+            }
+        }, 30000);
 
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
@@ -89,7 +96,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private void constructJob() {
         JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, new ComponentName(this, MyService.class));
-        builder.setPeriodic(4000)
+        builder.setPeriodic(POLL_FREQUENCY)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
                 .setPersisted(true);
 

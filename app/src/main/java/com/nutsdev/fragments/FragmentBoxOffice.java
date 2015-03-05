@@ -18,11 +18,14 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.nutsdev.adapters.AdapterBoxOffice;
+import com.nutsdev.callbacks.BoxOfficeMoviesLoadedListener;
 import com.nutsdev.extras.MovieSorter;
 import com.nutsdev.extras.SortListener;
+import com.nutsdev.logging.L;
 import com.nutsdev.materialtest.MyApplication;
 import com.nutsdev.materialtest.R;
 import com.nutsdev.pojo.Movie;
+import com.nutsdev.tasks.TaskLoadMoviesBoxOffice;
 
 import java.util.ArrayList;
 
@@ -31,7 +34,7 @@ import java.util.ArrayList;
  * Use the {@link FragmentBoxOffice#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FragmentBoxOffice extends Fragment implements SortListener {
+public class FragmentBoxOffice extends Fragment implements SortListener, BoxOfficeMoviesLoadedListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -125,9 +128,12 @@ public class FragmentBoxOffice extends Fragment implements SortListener {
 
         if (savedInstanceState != null) {
             listMovies = savedInstanceState.getParcelableArrayList(STATE_MOVIES);
-            adapterBoxOffice.setMovieList(listMovies);
         } else {
             listMovies = MyApplication.getWritableDatabase().getAllMoviesBoxOffice();
+            if (listMovies.isEmpty()) {
+                L.t(getActivity(), "executing task from fragment");
+                new TaskLoadMoviesBoxOffice(this).execute();
+            }
         }
 
         adapterBoxOffice.setMovieList(listMovies);
@@ -151,5 +157,11 @@ public class FragmentBoxOffice extends Fragment implements SortListener {
     public void onSortByRatings() {
         movieSorter.sortMoviesByRatings(listMovies);
         adapterBoxOffice.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onBoxOfficeMoviesLoaded(ArrayList<Movie> listMovies) {
+        L.t(getActivity(), "onBoxOfficeMoviesLoaded Fragment");
+        adapterBoxOffice.setMovieList(listMovies);
     }
 }
