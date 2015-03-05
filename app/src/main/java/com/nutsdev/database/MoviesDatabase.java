@@ -109,7 +109,7 @@ public class MoviesDatabase {
 
         private Context context;
         private static final String DB_NAME = "movies.db";
-        private static final int DB_VERSION = 2;
+        private static final int DB_VERSION = 6;
 
         public static final String TABLE_BOX_OFFICE = "movies_box_office";
         public static final String COLUMN_UID = "_id";
@@ -133,8 +133,8 @@ public class MoviesDatabase {
                 COLUMN_URL_SELF + " TEXT," +
                 COLUMN_URL_CAST + " TEXT," +
                 COLUMN_URL_REVIEWS + " TEXT," +
-                COLUMN_URL_SIMILAR + " TEXT," +
-                ");";
+                COLUMN_URL_SIMILAR + " TEXT" +
+                ")";
 
         public MoviesHelper(Context context) {
             super(context, DB_NAME, null, DB_VERSION);
@@ -156,11 +156,16 @@ public class MoviesDatabase {
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             try {
                 L.m("upgrade table box office executed");
-                db.execSQL(" DROP TABLE " + TABLE_BOX_OFFICE + " IF EXISTS;");
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOX_OFFICE);
                 onCreate(db);
             } catch (SQLiteException e) {
                 L.t(context, "exception " + e);
             }
+        }
+
+        @Override
+        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            super.onDowngrade(db, oldVersion, newVersion);
         }
     }
 

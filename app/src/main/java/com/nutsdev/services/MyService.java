@@ -92,7 +92,7 @@ public class MyService extends JobService {
             JSONObject response = sendJsonRequest();
             ArrayList<Movie> listMovies = parseJsonResponse(response);
 
-            MyApplication.getWritableDatabase().insertMoviesBoxOffice(listMovies, false);
+            MyApplication.getWritableDatabase().insertMoviesBoxOffice(listMovies, true);
             return params[0];
         }
 
@@ -218,6 +218,10 @@ public class MyService extends JobService {
                         movie.setAudienceScore(audienceScore);
                         movie.setSynopsis(synopsis);
                         movie.setUrlThumbnail(urlThumbnail);
+                        movie.setUrlSelf(urlSelf);
+                        movie.setUrlCast(urlCast);
+                        movie.setUrlReviews(urlReviews);
+                        movie.setUrlSimilar(urlSimilar);
 
                         if (id != -1 && !title.equals(Constants.NA)) {
                             listMovies.add(movie);
