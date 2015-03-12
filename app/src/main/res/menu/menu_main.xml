@@ -23,4 +23,9 @@
         android:orderInCategory="400"
         app:showAsAction="never" />
 
+    <item android:id="@+id/action_activity_animator"
+        android:title="RecyclerItemAnimator"
+        android:orderInCategory="500"
+        app:showAsAction="never" />
+
 </menu>

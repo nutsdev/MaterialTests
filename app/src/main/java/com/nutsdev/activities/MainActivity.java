@@ -169,6 +169,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (id == R.id.action_activity_vector) {
             startActivity(new Intent(this, VectorTestActivity.class));
         }
+        if (id == R.id.action_activity_animator) {
+            startActivity(new Intent(this, ActivityRecyclerItemAnimations.class));
+        }
 
         return super.onOptionsItemSelected(item);
     }
