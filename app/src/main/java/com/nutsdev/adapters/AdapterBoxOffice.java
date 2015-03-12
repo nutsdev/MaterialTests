@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.nutsdev.anim.AnimationUtils;
 import com.nutsdev.extras.Constants;
 import com.nutsdev.materialtest.R;
 import com.nutsdev.network.VolleySingleton;
@@ -31,6 +32,7 @@ public class AdapterBoxOffice extends RecyclerView.Adapter<AdapterBoxOffice.View
     private VolleySingleton volleySingleton;
     private ImageLoader imageLoader;
     private DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+    private int previousPosition = 0;
 
     public AdapterBoxOffice(Context context) {
         layoutInflater = LayoutInflater.from(context);
@@ -71,6 +73,13 @@ public class AdapterBoxOffice extends RecyclerView.Adapter<AdapterBoxOffice.View
             holder.movieAudienceScore.setRating(audienceScore / 20.0f);
             holder.movieAudienceScore.setAlpha(1.0f);
         }
+
+        if (position > previousPosition) {
+            AnimationUtils.animate(holder, true);
+        } else {
+            AnimationUtils.animate(holder, false);
+        }
+        previousPosition = position;
 
         String urlThumnail = currentMovie.getUrlThumbnail();
         loadImages(urlThumnail, holder);

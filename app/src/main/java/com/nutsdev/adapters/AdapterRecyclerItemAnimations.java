@@ -32,12 +32,13 @@ public class AdapterRecyclerItemAnimations extends RecyclerView.Adapter<AdapterR
     }
 
     @Override
-    public void onBindViewHolder(Holder holder, final int position) {
+    public void onBindViewHolder(final Holder holder, final int position) {
         String data = listData.get(position);
         holder.textDataItem.setText(data);
         holder.buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int position = holder.getPosition();
                 removeItem(position);
             }
         });
