@@ -18,6 +18,7 @@ import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.nutsdev.extras.SortListener;
@@ -56,6 +57,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private ViewPagerAdapter adapter;
     private ViewPager mPager;
     private SlidingTabLayout mTabs;
+    private ViewGroup containerAppBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +73,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }, 30000);
 
         toolbar = (Toolbar) findViewById(R.id.app_bar);
+        containerAppBar= (ViewGroup) findViewById(R.id.container_app_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+    //    AnimationUtils.animateToolbar(containerAppBar);
 
         drawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
